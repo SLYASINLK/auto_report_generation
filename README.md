@@ -46,41 +46,16 @@ graph LR
 ```
 
 Agent List:
-| Agent Name                       | Report Section              | Task Description                                                                 | Required GIS Functionalities                                                      | Tools / Modules (Planned)                                    | Status       |
-|----------------------------------|-----------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------|--------------|
-| basic_info_agent                 | Site Overview               | Collect coordinates, land use, region, POI category, commercial format, date     | - Geocoding (address → coordinates)                                               |
-- Spatial join to land use/region polygon
-- POI category mapping                | - geocode_address
-- PostGIS polygon intersect
-- POI category dictionary             | Done         |
-| traffic_analysis_agent           | Traffic Analysis            | Count nearby MRT & bus stops
-Calculate distance to nearest station
-Estimate walking time               | - Buffer-based POI count
-- Nearest neighbor analysis
-- Distance-to-time estimation       | - PostGIS ST_Buffer, ST_Distance
-- Walking time estimation model     | Done         |
-| location_analysis_agent          | Location Analysis           | Identify district function
-Evaluate commercial suitability
-Analyze surrounding land use       | - Regional polygon match
-- Overlay with zoning layer
-- Functional zone extraction        | - Land use shapefile
-- Planning attribute overlay        | unfinished   |
-| competitor_analysis_agent        | Competitor Analysis         | Count nearby competitors
-List main brands
-Evaluate market density            | - POI clustering
-- Distance-based ranking
-- Spatial density heatmap          | - ST_DWithin
-- Brand category classifier         | unfinished   |
-| cost_analysis_agent              | Cost Analysis               | Retrieve rental data
-Calculate average rent
-(Optional: generate rent heatmap) | - Spatial join with rental database
-- Historical trend mapping         | - Rental database
-- Raster or zonal rent grid        | unfinished   |
-| consumer_potential_analysis_agent | Consumer Potential Analysis | Retrieve population and housing data
-Estimate consumption power         | - Population/housing spatial distribution
-- Zonal income modeling            | - Population raster or zones
-- Price data + income model        | unfinished   |
-| site_selection_report_agent      | Report Generation           | Generate full report (Markdown/HTML)                                            | None                                                                               | - Markdown formatter
-- HTML converter                   | Done         |
+| Agent Name                        | Report Section              | Task Description                                                             | Required GIS Functionalities                                                    | Tools / Modules (Planned)                                       | Web Search | City-wide Comparison | Status       |
+|----------------------------------|-----------------------------|------------------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------|------------|-----------------------|--------------|
+| basic_info_agent                 | Site Overview               | Collect coordinates, land use, region, POI category, commercial format, date | Geocoding, spatial join to land use/region, POI category mapping                | geocode_address, PostGIS polygon intersect, POI category mapping | No         | No                    | Done         |
+| report_template_parser_agent     | N/A                         | Parse the report template into detailed tasks                                | None                                                                            | Template parser                                                  | No         | No                    | Done         |
+| task_planning_agent              | N/A                         | Assign parsed tasks to appropriate agents based on capabilities              | None                                                                            | Task router, agent registry                                      | No         | No                    | Done         |
+| traffic_analysis_agent           | Traffic Analysis            | Count nearby MRT/bus stops, distance to station, estimate walk time          | Buffer zone POI count, distance analysis                                        | PostGIS ST_Buffer, ST_Distance, walking time model               | No         | ✅ Yes                | unfinished         |
+| location_analysis_agent          | Location Analysis           | Identify district function, analyze zoning & commercial suitability          | Regional matching, land use overlay                                             | Zoning shapefile, policy map                                     | ✅ Yes      | ✅ Yes                | unfinished   |
+| competitor_analysis_agent        | Competitor Analysis         | Count competitors, list brands, evaluate density & heatmap                   | POI clustering, distance to competitors, brand presence density                 | ST_DWithin, POI category filter, spatial heatmap                 | ✅ Yes      | ✅ Yes                | unfinished   |
+| cost_analysis_agent              | Cost Analysis               | Retrieve rent data, calculate avg rent, generate rental insights             | Spatial join with rent DB, trend chart, optional rent web scrape                | Rental database, market site parsing                             | ✅ Yes      | ✅ Yes                | unfinished   |
+| consumer_potential_analysis_agent | Consumer Potential Analysis | Population & housing analysis, estimate spending power                       | Spatial population mapping, price zone matching, online consumer behavior       | Population raster, price layer, income zone model                | ✅ Yes      | ✅ Yes                | unfinished   |
+| site_selection_report_agent      | Report Generation           | Compile and generate full Markdown/HTML report                               | None                                                                            | Markdown formatter, HTML converter                              | No         | No                    | Done         |
 
 
