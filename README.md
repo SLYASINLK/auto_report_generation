@@ -16,6 +16,7 @@ graph LR
 
     subgraph Report Template Parsing
         D1[report_template] --> D2[report_template_parser_agent - 拆解模板任务]
+        A --> D2
         D2 --> E1[Traffic Task]
         D2 --> E2[Location Task]
         D2 --> E3[Competitor Task]
