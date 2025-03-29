@@ -11,25 +11,26 @@
 ## Overall Framework:
 ```mermaid
 graph LR
-    A[User Input] --> B[basic_info_agent - 获取坐标/业态/区域信息]
-    B --> C[Task Dictionary]
 
-    subgraph Report Template Parsing
+    subgraph Task Preparation
+        A[User Input] --> B[basic_info_agent - 获取基础信息]
+        B --> C1[task_list]
+
         D1[report_template] --> D2[report_template_parser_agent - 拆解模板任务]
-        A --> D2
         D2 --> E1[Traffic Task]
         D2 --> E2[Location Task]
         D2 --> E3[Competitor Task]
         D2 --> E4[Cost Task]
         D2 --> E5[Consumer Task]
-        E1 --> E6[task_list]
-        E2 --> E6
-        E3 --> E6
-        E4 --> E6
-        E5 --> E6
+        E1 --> C2[task_list]
+        E2 --> C2
+        E3 --> C2
+        E4 --> C2
+        E5 --> C2
     end
 
-    E6 --> F[task_planning_agent - 任务分配]
+    C1 --> F[task_planning_agent - 任务分配]
+    C2 --> F
 
     F --> G1[traffic_analysis_agent]
     F --> G2[location_analysis_agent]
@@ -37,15 +38,16 @@ graph LR
     F --> G4[cost_analysis_agent]
     F --> G5[consumer_potential_analysis_agent]
 
-    G1 --> C
-    G2 --> C
-    G3 --> C
-    G4 --> C
-    G5 --> C
+    G1 --> T[Task Dictionary]
+    G2 --> T
+    G3 --> T
+    G4 --> T
+    G5 --> T
 
-    C --> H[site_selection_report_agent - 生成报告]
+    T --> H[site_selection_report_agent - 生成报告]
     H --> I[Final Report]
 ```
+
 
 
 ## Agent List:
