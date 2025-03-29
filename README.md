@@ -28,7 +28,8 @@ graph LR
         E5 --> E6
     end
 
-    D2 --> F[task_planning_agent - 任务分配]
+    E6 --> F[task_planning_agent - 任务分配]
+
     F --> G1[traffic_analysis_agent]
     F --> G2[location_analysis_agent]
     F --> G3[competitor_analysis_agent]
@@ -45,7 +46,8 @@ graph LR
     H --> I[Final Report]
 ```
 
-Agent List:
+
+## Agent List:
 | Agent Name                        | Report Section              | Task Description                                                             | Required GIS Functionalities                                                    | Tools / Modules (Planned)                                       | Web Search | City-wide Comparison | Status       |
 |----------------------------------|-----------------------------|------------------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------|------------|-----------------------|--------------|
 | basic_info_agent                 | Site Overview               | Collect coordinates, land use, region, POI category, commercial format, date | Geocoding, spatial join to land use/region, POI category mapping                | geocode_address, PostGIS polygon intersect, POI category mapping | No         | No                    | Done         |
