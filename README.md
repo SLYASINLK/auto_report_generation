@@ -15,15 +15,20 @@ graph LR
     B --> C[Task Dictionary]
 
     subgraph Report Template Parsing
-        D[report_template_parser_agent - 拆解模板任务]
-        D --> E1[Traffic Task]
-        D --> E2[Location Task]
-        D --> E3[Competitor Task]
-        D --> E4[Cost Task]
-        D --> E5[Consumer Task]
+        D1[report_template] --> D2[report_template_parser_agent - 拆解模板任务]
+        D2 --> E1[Traffic Task]
+        D2 --> E2[Location Task]
+        D2 --> E3[Competitor Task]
+        D2 --> E4[Cost Task]
+        D2 --> E5[Consumer Task]
+        E1 --> E6[task_list]
+        E2 --> E6
+        E3 --> E6
+        E4 --> E6
+        E5 --> E6
     end
 
-    D --> F[task_planning_agent - 任务分配]
+    D2 --> F[task_planning_agent - 任务分配]
     F --> G1[traffic_analysis_agent]
     F --> G2[location_analysis_agent]
     F --> G3[competitor_analysis_agent]
@@ -41,5 +46,41 @@ graph LR
 ```
 
 Agent List:
+| Agent Name                       | Report Section              | Task Description                                                                 | Required GIS Functionalities                                                      | Tools / Modules (Planned)                                    | Status       |
+|----------------------------------|-----------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------|--------------|
+| basic_info_agent                 | Site Overview               | Collect coordinates, land use, region, POI category, commercial format, date     | - Geocoding (address → coordinates)                                               |
+- Spatial join to land use/region polygon
+- POI category mapping                | - geocode_address
+- PostGIS polygon intersect
+- POI category dictionary             | Done         |
+| traffic_analysis_agent           | Traffic Analysis            | Count nearby MRT & bus stops
+Calculate distance to nearest station
+Estimate walking time               | - Buffer-based POI count
+- Nearest neighbor analysis
+- Distance-to-time estimation       | - PostGIS ST_Buffer, ST_Distance
+- Walking time estimation model     | Done         |
+| location_analysis_agent          | Location Analysis           | Identify district function
+Evaluate commercial suitability
+Analyze surrounding land use       | - Regional polygon match
+- Overlay with zoning layer
+- Functional zone extraction        | - Land use shapefile
+- Planning attribute overlay        | unfinished   |
+| competitor_analysis_agent        | Competitor Analysis         | Count nearby competitors
+List main brands
+Evaluate market density            | - POI clustering
+- Distance-based ranking
+- Spatial density heatmap          | - ST_DWithin
+- Brand category classifier         | unfinished   |
+| cost_analysis_agent              | Cost Analysis               | Retrieve rental data
+Calculate average rent
+(Optional: generate rent heatmap) | - Spatial join with rental database
+- Historical trend mapping         | - Rental database
+- Raster or zonal rent grid        | unfinished   |
+| consumer_potential_analysis_agent | Consumer Potential Analysis | Retrieve population and housing data
+Estimate consumption power         | - Population/housing spatial distribution
+- Zonal income modeling            | - Population raster or zones
+- Price data + income model        | unfinished   |
+| site_selection_report_agent      | Report Generation           | Generate full report (Markdown/HTML)                                            | None                                                                               | - Markdown formatter
+- HTML converter                   | Done         |
 
 
