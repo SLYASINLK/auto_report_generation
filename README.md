@@ -13,24 +13,16 @@
 graph LR
 
     subgraph Task Preparation
-        A[User Input] --> B[basic_info_agent - 获取基础信息]
-        B --> C1[task_list]
+        A[User Input]
+        A --> B[basic_info_agent - 获取基础信息]
+        A --> D[report_template_parser_agent - 解析模板任务]
 
-        D1[report_template] --> D2[report_template_parser_agent - 拆解模板任务]
-        D2 --> E1[Traffic Task]
-        D2 --> E2[Location Task]
-        D2 --> E3[Competitor Task]
-        D2 --> E4[Cost Task]
-        D2 --> E5[Consumer Task]
-        E1 --> C2[task_list]
-        E2 --> C2
-        E3 --> C2
-        E4 --> C2
-        E5 --> C2
+        B --> F1[basic_info]
+        D --> F2[task_list]
     end
 
-    C1 --> F[task_planning_agent - 任务分配]
-    C2 --> F
+    F1 --> F[task_planning_agent - 任务分配]
+    F2 --> F
 
     F --> G1[traffic_analysis_agent]
     F --> G2[location_analysis_agent]
@@ -47,6 +39,7 @@ graph LR
     T --> H[site_selection_report_agent - 生成报告]
     H --> I[Final Report]
 ```
+
 
 
 
