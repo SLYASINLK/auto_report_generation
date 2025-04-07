@@ -12,6 +12,14 @@
 ```mermaid
 graph LR
 
+    %%{init}%% {
+    %% 调整节点对齐方式
+    "flowchart": {
+        "nodeSpacing": 10,
+        "rankSpacing": 40
+    }
+    }
+
     %% ===== Subgraph: User Input & Task Preparation =====
     subgraph Task Preparation
         direction TB
@@ -33,7 +41,7 @@ graph LR
     end
 
     %% ===== Subgraph: Task Execution =====
-    subgraph Task Execution
+    subgraph Task_Execution ["Task Execution"]
         direction TB
         X --> F[task_planning_agent<br>任务分配]
         Y --> F
@@ -53,6 +61,11 @@ graph LR
         T --> H[site_selection_report_agent<br>生成报告]
         H --> I[Final Report]
     end
+
+    %% 不可见的连接线用于对齐
+    Task Preparation --> Task_Execution
+    style Task Preparation fill:none,stroke:none
+    style Task_Execution fill:none,stroke:none
 ```
 
 ## Agent List:
