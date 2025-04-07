@@ -3,7 +3,12 @@ import psycopg2
 from tavily import TavilyClient
 from agents import function_tool
 from datetime import datetime
+from typing import List
+import time
 
+#################################################
+# GET CURRENT DATE                              #
+#################################################
 @function_tool
 async def get_current_date() -> str:
     """
@@ -11,6 +16,9 @@ async def get_current_date() -> str:
     """
     return datetime.now().strftime("%Y-%m-%d")
 
+#################################################
+# GEOCODE ADDRESS                              #
+#################################################
 @function_tool
 async def geocode_address(address: str) -> dict:
     """
@@ -37,34 +45,123 @@ async def geocode_address(address: str) -> dict:
             raise ValueError("Failed to get geocoding results for the address.")
     else:
         raise ConnectionError(f"Request failed, status code: {response.status_code}")
-
-@function_tool
-async def query_postgis(sql_query: str) -> list:
-    """
-    Query PostGIS database with SQL and return results
-    """
-    connection = psycopg2.connect(
-        dbname="site_selection",
-        user="postgres",
-        password="xzy565665",
-        host="localhost",
-        port="5432"
-    )
-    cursor = connection.cursor()
     
-    try:
-        cursor.execute(sql_query)
-        columns = [desc[0] for desc in cursor.description]
-        rows = cursor.fetchall()
-        result = [dict(zip(columns, row)) for row in rows]
-        connection.commit()
-        return result
-    except Exception as e:
-        return str(e)
-    finally:
-        cursor.close()
-        connection.close()
+#################################################
+# SEARCH COMPETITOR INFOMATION                  #
+#################################################
+@function_tool
+async def search_competitor_infomation(
+    latitude: float,
+    longitude: float,
+    radius: int,
+    place_type: str,
+    max_results: int
+) -> List[dict]:
+    """
+    Search for nearby competitor businesses (e.g., restaurants, cafes) based on location and return detailed info.
 
+    Parameters:
+    - latitude: Latitude of the search center
+    - longitude: Longitude of the search center
+    - radius: Search radius in meters, e.g., 500
+    - place_type: Type of competitor places to search, e.g., 'restaurant', 'cafe'
+    - max_results: Maximum number of places to return, e.g., 5
+
+    Returns:
+    - A list of dictionaries, each representing a nearby competitor with:
+      - name: Display name of the place
+      - address: Formatted address of the place
+      - rating: Google rating (if available)
+      - priceLevel: Price level (1–4, if available)
+      - openingHours: List of weekday opening hours (if available)
+      - reviews: Up to 3 user reviews with author, text, and relative time
+    """
+
+    API_KEY = "AIzaSyD2CNSJLAGhpfK7OxKXNdn0VHHMRlvRZxY"
+
+    # Step 1: Nearby search request
+    nearby_url = "https://places.googleapis.com/v1/places:searchNearby"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": API_KEY,
+        "X-Goog-FieldMask": ",".join([
+            "places.displayName",
+            "places.location",
+            "places.rating",
+            "places.priceLevel",
+            "places.regularOpeningHours",
+            "places.formattedAddress",
+            "places.id"
+        ])
+    }
+    payload = {
+        "includedTypes": [place_type],
+        "maxResultCount": max_results,
+        "locationRestriction": {
+            "circle": {
+                "center": {"latitude": latitude, "longitude": longitude},
+                "radius": radius
+            }
+        }
+    }
+
+    nearby_response = requests.post(nearby_url, headers=headers, json=payload)
+    if nearby_response.status_code != 200:
+        return [{"error": f"Nearby search failed: {nearby_response.text}"}]
+
+    places = nearby_response.json().get("places", [])
+    results = []
+
+    # Step 2: Get details for each place
+    for place in places:
+        place_id = place.get("id")
+        if not place_id:
+            continue
+
+        detail_url = f"https://places.googleapis.com/v1/places/{place_id}"
+        detail_headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": API_KEY
+        }
+        params = {
+            "fields": ",".join([
+                "displayName",
+                "formattedAddress",
+                "regularOpeningHours",
+                "rating",
+                "priceLevel",
+                "reviews"
+            ])
+        }
+
+        detail_response = requests.get(detail_url, headers=detail_headers, params=params)
+        if detail_response.status_code != 200:
+            continue
+
+        data = detail_response.json()
+        place_info = {
+            "name": data.get("displayName", {}).get("text", "Unknown"),
+            "address": data.get("formattedAddress", "No address"),
+            "rating": data.get("rating", "No rating"),
+            "priceLevel": data.get("priceLevel", "No price info"),
+            "openingHours": data.get("regularOpeningHours", {}).get("weekdayDescriptions", []),
+            "reviews": [
+                {
+                    "author": r.get("authorDisplayName", "Anonymous"),
+                    "text": r.get("text", {}).get("text", ""),
+                    "time": r.get("relativePublishTimeDescription", "")
+                }
+                for r in data.get("reviews", [])[:3]  # Limit to top 3 reviews
+            ]
+        }
+        results.append(place_info)
+        time.sleep(0.3)  # Rate limit control
+
+    return results
+
+#################################################
+# GET POSTGIS TABLE METADATA                     #
+#################################################
 @function_tool
 async def get_postgis_table_metadata():
     """
@@ -137,33 +234,73 @@ async def get_postgis_table_metadata():
 
     return result
 
+#################################################
+# QUERY POSTGIS TEMPLATE                         #
+#################################################
 @function_tool
 async def query_postgis_template(template: str) -> str:
     """
-    Read SQL template for querying PostGIS database
+    Read SQL samples for querying PostGIS database
+    - population_density: how to use coordinate to retrieve population density.
+    - find_nearby_bus_stops: how to find nearby bus stops.
+    - find_nearby_mrt_stations: how to find nearby mrt stations.
     """
-    if template == "population_density_indicator":
+    if template == "population_density":
         return '''
-        **population_density_indicator** caculation method:
-        WITH all_poi_pop_values AS (
-        SELECT ST_Value(r.rast, p.geom) AS pop_density
-        FROM sg_poi p
-        JOIN sg_pop r
-        ON ST_Intersects(r.rast, p.geom)
-        WHERE p.fclass = '{specific_category}' AND ST_Value(r.rast, p.geom) IS NOT NULL
-        ),
-        target_poi AS (
-            SELECT ST_Value(r.rast, ST_SetSRID(ST_MakePoint({longtitude}, {latitude}), 4326)) AS target_density
-            FROM sg_pop r
-            WHERE ST_Intersects(r.rast, ST_SetSRID(ST_MakePoint({longtitude}, {latitude}), 4326))
-        )
         SELECT 
-            t.target_density,
-            ROUND(100.0 * COUNT(a.pop_density) FILTER (WHERE a.pop_density <= t.target_density) / COUNT(a.pop_density), 2) AS percentile
-        FROM all_poi_pop_values a, target_poi t
-        GROUP BY t.target_density;
+        ST_Value(
+            rast, 
+            ST_SetSRID(ST_MakePoint(103.7766916, 1.2976493), 4326)
+        ) AS pop_density
+        FROM sg_pop
+        WHERE 
+        ST_Intersects(
+            rast, 
+            ST_SetSRID(ST_MakePoint(103.7766916, 1.2976493), 4326)
+        );
+        '''
+    if template == "find_nearby_bus_stops":
+        return '''
+        SELECT * FROM find_nearby_bus_stops(103.7764, 1.2966);
+        '''
+    if template == "find_nearby_mrt_stations":
+        return '''
+        SELECT * FROM find_nearby_mrt_stations(103.7764, 1.2966, 3000);
         '''
 
+#################################################
+# QUERY POSTGIS DATABASE                        #
+#################################################
+@function_tool
+async def query_postgis(sql_query: str) -> list:
+    """
+    Query PostGIS database with SQL and return results
+    """
+    connection = psycopg2.connect(
+        dbname="site_selection",
+        user="postgres",
+        password="xzy565665",
+        host="localhost",
+        port="5432"
+    )
+    cursor = connection.cursor()
+    
+    try:
+        cursor.execute(sql_query)
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        result = [dict(zip(columns, row)) for row in rows]
+        connection.commit()
+        return result
+    except Exception as e:
+        return str(e)
+    finally:
+        cursor.close()
+        connection.close()
+
+#################################################
+# WEB SEARCH                                   #
+#################################################
 @function_tool
 async def web_search(query: str) -> list[dict]:
     """

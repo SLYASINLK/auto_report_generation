@@ -13,8 +13,14 @@ Below is a template for the site selection report.
 - Number of Bus Stops: `X`
 - Number of MRT Stations: `X`
 ### **Key Transport Points**:
-- `XX Station (Distance: XX m)`
-- `XX Station (Distance: XX m)`
+#### `XX Bus Stop`
+- Distance: XX m
+- Passenger Volume: XX
+- Rank in Singapore: XX
+#### `XX MRT Station`
+- Distance: XX m
+- Passenger Volume: XX
+- Rank in Singapore: XX`
 ### **Walking Accessibility**:
 - Estimated Walking Time to Nearest MRT Station: `X` minutes
 - Estimated Walking Time to Nearest Bus Stop: `X` minutes
@@ -31,9 +37,21 @@ Below is a template for the site selection report.
 - `(Example: High potential for commercial development, well-suited for the target customer group)`
 ## 4. Competitor Analysis
 ### **Number of Competitors Nearby**: `X`
-### **Main Competitor Brands**:
-- `XX Coffee (Distance: XXm, Price Range: $X-$X)`
-- `XX Coffee (Distance: XXm, Rating: X.X/5)`
+### **Main Competitor Information**:
+#### XX Coffee 
+- Address: XX
+- Price Range: $X-$X
+- Customer Comment: XX
+- Rating: X.X/5
+- Opening Hours: XX
+- Reviews: XX
+#### XX Coffee 
+- Address: XX
+- Price Range: $X-$X
+- Customer Comment: XX
+- Rating: X.X/5
+- Opening Hours: XX
+- Reviews: XX
 ### **Market Density**: 
 - `(Example: High density, intense competition)`
 ### **Conclusion**: 
@@ -44,11 +62,10 @@ Below is a template for the site selection report.
 - `(Example: High rental costs, requiring high customer spending or quick table turnover to ensure profitability)`
 ## 6. Consumer Potential Analysis
 ### **Nearby Population Density**: `X people/km²`
-### **Average Housing Prices Nearby**: `X SGD/m²`
-### **Spending Power Analysis**: 
-- `(Example: This area belongs to a mid-to-high-income segment, with an average monthly expenditure of $X, making it suitable for a premium coffee shop)`
+### **Resident Income Analysis**:
+- `(Example: The residents here have relatively high incomes, with an average monthly income of xx SGD/month, ranking third in Singapore. The income structure of the residents is approximately as follows... )`
 ### **Conclusion**: 
-- `(Example: Stable consumer spending power, suitable for mid-to-high-end coffee brands)`
+- `(Example: This area is densely populated with high-income residents, making it suitable for opening upscale coffee shops.)`
 ## 7. Overall Assessment
 | Dimension | Rating (1-5) | Description |
 |------|--------|------|

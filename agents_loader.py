@@ -6,7 +6,8 @@ from tools import (
     query_postgis,
     get_postgis_table_metadata,
     query_postgis_template,
-    web_search
+    web_search,
+    search_competitor_infomation
 )
 
 from info_tools import (
@@ -36,7 +37,8 @@ def load_agents_from_yaml(filepath: str) -> dict:
     "add_information_initial": add_information_initial,
     "add_information": add_information,
     "get_information": get_information,
-    "update_information": update_information
+    "update_information": update_information,
+    "search_competitor_infomation": search_competitor_infomation
     }
 
     # 构建 agent 实例
